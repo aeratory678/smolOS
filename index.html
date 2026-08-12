@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>smolOS</title>
+        <style>
+            :root{--pink:#ec3750;--dark:#191317:--paper:#fffdfd}
+            *{box-sizing:border-box}
+            html,body{width:100%;height:100%;margin:0}
+            body{
+                font-family:"Courier New",monospace;color:var(--dark);overflow:hidden;
+                background:#ec3750;
+                background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.18) 0 2px,transparent 2px 10px);
+            }
+            button,input,textarea{font:inherit}
+            button{cursor:pointer}
+            #desktop{position:fixed;inset:0}
+            #top{
+                position:absolute;z-index:10000;top:0;left:0;width:100%;height:48px;
+                display:flex;align-items:center;justify-content:space-between;padding:7px 12px;
+                background:rgba(255,255,255,.94);border-bottom:2px solid var(--dark);
+                box-shadow:0 3px 0 rgba(0,0,0,.15)
+            }
+            .badge{background:#fff;border:1px solid var(--dark);padding:4px 8px;box-shadow:2px 2px 0 var(--dark);font-size:12px}
+            #desktopApps{position:absolute;top:62px;left:12px;display:flex;gap:8px;}
+            .appIcon{width:92px;padding:8px;text-align:center;color:#fff;filter:drop-shadow(0 0 7px #000);user-select:none}
+            .appIcon.selected{background:rgba(225,225,225,.22);border-radius:10px;}
+            .appIcon svg{display:block;margin:auto;width:64px;height:64px}
+            .appIcon p{margin:3px 0 0;font-weight:bold;font-size:12px}
+
+            .window{
+                position:absolute;z-index:2;display:flex;flex-direction:column;
+                background:var(--paper);border:2px solid var(--dark);border-radius:7px;
+                box-shadow:6px 6px 0 rgba(0,0,0,.28);overflow:hidden
+            }
+            .windowheader{
+                height:36px;display:flex;align-items:center;padding:0 8px;
+                color:#fff;background:var(--pink);border-botton:2px solid var(--dark);
+                cursor:grab;user-select:none
+            }
+            .headertext{flex:1;text-align:center;margin:0;font-size:12px;font-weight:bold}
+            .closebutton{
+                width:16px;height:16px;border:2px solid #fff;border-radius:50%;
+                position:relative;cursor:pointer;flex:none
+            }
+            .closebutton:before,.closebutton:after{
+                content:"";position:absolute;left:3px;top:6px;width:7px;height:2px;background:#fff
+            }
+            .closebutton:before{transform:rotate(45deg)}
+            .closebutton:after{transform:rotate(-45deg)}
+            .window-control-space{width:16px;flex:none}
+
+            #welcome{width:430px;top:calc(50% - 175px);left:calc(50% - 215px)}
+.welcome-content{padding:18px}
+.welcome-card{background:#fff;border:2px solid var(--dark);padding:22px;box-shadow:4px 4px 0 var(--pink)}
+.welcome-card h1{margin:0;font-size:38px}
+.welcome-card h2{margin:5px 0 18px;color:var(--pink)}
+.welcome-card p{line-height:1.5}
+.welcome-link{color:var(--pink);font-weight:bold}
+
+#notes{display:none;width:650px;top:calc(50% - 260px);left:calc(50% - 325px)}
+.notesContent{height:500px;display:flex;gap:12px;padding:12px;background:#fff}
+#sidebar{width:190px;overflow:auto}
+.noteItem{padding:10px;border:2px solid transparent;margin-bottom:7px;cursor:pointer}
+.noteItem:hover,.noteItem.active{background:#fff0f2;border-color:var(--pink)}
+.noteItem small{display:block;opacity:.65}
+#notePane{flex:1;display:flex;flex-direction:column;gap:8px}
+#noteTitle{font-weight:bold;font-size:18px}
+#noteText{flex:1;resize:none;border:2px solid var(--dark);padding:12px;background:#fff}
+#addNote,#saveNote{border:2px solid var(--dark);background:#fff;padding:8px}
+#addNote:hover,#saveNote:hover{background:#fff0f2}
+
+
+/* calculator */
+#calcKeys button{border:2px solid #191317;background:#fff;border-radius:6px;padding:13px 5px;font-size:16px}
+#calcKeys button:hover{background:#fff0f2}
+#calcKeys .calc-op{background:#fff0f2}
+</style>
+</head>
+<body>
+<div id="desktop">
+  <div id="top">
+    <span class="badge">smolOS</span>
+    <span class="badge">sleepy.zzz.</span>
+    <span id="clock"></span>
+  </div>
+
+  <div id="desktopApps">
+    <div id="notesIcon" class="appIcon">
+      <svg viewBox="0 0 64 64"><rect x="9" y="6" width="46" height="52" rx="3" fill="#fff" stroke="#191317" stroke-width="3"/><path d="M18 19h28M18 30h28M18 41h20M18 50h14" stroke="#ec3750" stroke-width="4"/></svg>
+      <p>Notes</p>
+    </div>
+    <div id="clockIcon" class="appIcon">
+      <svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="23" fill="#fff" stroke="#191317" stroke-width="3"/><path d="M32 18v15l10 7" fill="none" stroke="#ec3750" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <p>Clock</p>
+    </div>
+    <div id="calculatorIcon" class="appIcon">
+      <svg viewBox="0 0 64 64"><rect x="12" y="6" width="40" height="52" rx="4" fill="#fff" stroke="#191317" stroke-width="3"/><rect x="19" y="13" width="26" height="10" fill="#ec3750" stroke="#191317" stroke-width="2"/><path d="M20 31h6M31 31h6M42 31h1M20 40h6M31 40h6M42 40h1M20 49h6M31 49h6M42 49h1" stroke="#191317" stroke-width="3" stroke-linecap="round"/></svg>
+      <p>Calculator</p>
+    </div>
+  </div>
+
+  <div id="welcome" class="window">
+    <div class="windowheader" id="welcomeHeader"><div class="closebutton" id="welcomeClose"></div><p class="headertext">Welcome</p><div class="window-control-space"></div></div>
+    <div class="welcome-content">
+      <div class="welcome-card">
+        <h1>smolOS</h1><h2>sleepy.zzz.</h2>
+        <p>Welcome to my personal operating system.</p>
+        <p>Pick an app from the desktop to get started.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="notes" class="window">
+    <div class="windowheader" id="notesHeader"><div class="closebutton" id="notesClose"></div><p class="headertext">Notes</p><div class="window-control-space"></div></div>
+    <div class="notesContent">
+      <div id="sidebar">
+        <button id="addNote" style="width:100%;margin-bottom:8px">+ add note</button>
+        <div id="noteList"></div>
+      </div>
+      <div id="notePane">
+        <input id="noteTitle" placeholder="title">
+        <textarea id="noteText" placeholder="content"></textarea>
+        <button id="saveNote">Save note</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="clockApp" class="window" style="display:none;width:430px;top:calc(50% - 190px);left:calc(50% - 215px)">
+    <div class="windowheader" id="clockHeader">
+      <div class="closebutton" id="clockClose"></div>
+      <p class="headertext">Clock</p>
+      <div class="window-control-space"></div>
+    </div>
+    <div style="padding:22px;text-align:center;background:#fff">
+      <div id="bigClock" style="font-size:48px;font-weight:bold;letter-spacing:3px">00:00:00</div>
+      <div id="bigDate" style="margin-top:10px;color:#ec3750;font-weight:bold"></div>
+      <p style="opacity:.65">sleepy.zzz. time</p>
+    </div>
+  </div>
+</div>
+
+  <div id="calculatorApp" class="window" style="display:none;width:360px;top:calc(50% - 250px);left:calc(50% - 180px)">
+    <div class="windowheader" id="calculatorHeader">
+      <div class="closebutton" id="calculatorClose"></div>
+      <p class="headertext">Calculator</p>
+      <div class="window-control-space"></div>
+    </div>
+    <div style="padding:14px;background:#fff">
+      <input id="calcDisplay" readonly value="0"
+        style="width:100%;height:58px;box-sizing:border-box;border:2px solid #191317;background:#fff0f2;padding:8px;text-align:right;font-size:27px;margin-bottom:10px">
+      <div id="calcKeys" style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px"></div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  const $=s=>document.querySelector(s);
+  let z=10;
+  function bring(w){z++;w.style.zIndex=z}
+  function close(w,icon){w.style.display="none";icon&&icon.classList.remove("selected")}
+  function open(w,icon){w.style.display="flex";bring(w);icon&&icon.classList.add("selected")}
+
+  function drag(w,header){
+    let dragging=false,ox=0,oy=0;
+    header.addEventListener("mousedown",e=>{
+      if(e.target.classList.contains("closebutton"))return;
+      dragging=true;bring(w);ox=e.clientX-w.offsetLeft;oy=e.clientY-w.offsetTop
+    });
+    document.addEventListener("mousemove",e=>{if(dragging){w.style.left=Math.max(0,e.clientX-ox)+"px";w.style.top=Math.max(48,e.clientY-oy)+"px"}});
+    document.addEventListener("mouseup",()=>dragging=false);
+    w.addEventListener("mousedown",()=>bring(w));
+  }
+
+  const welcome=$("#welcome"),notes=$("#notes");
+  const notesIcon=$("#notesIcon");
+  drag(welcome,$("#welcomeHeader"));drag(notes,$("#notesHeader"));
+
+  $("#welcomeClose").onclick=()=>close(welcome);
+  notesIcon.onclick=()=>open(notes,notesIcon);
+  $("#notesClose").onclick=()=>close(notes,notesIcon);
+
+  setInterval(()=>$("#clock").textContent=new Date().toLocaleTimeString([], {hour:"numeric",minute:"2-digit",hour12:true}),1000);
+  $("#clock").textContent=new Date().toLocaleTimeString([], {hour:"numeric",minute:"2-digit",hour12:true});
+
+  // NOTES
+  let notesData;
+  try{notesData=JSON.parse(localStorage.getItem("smolOS_notes")||"null")}catch(e){notesData=null}
+  if(!Array.isArray(notesData)||!notesData.length)notesData=[{title:"diary",text:"This is my diary",date:new Date().toLocaleDateString()}];
+  let selected=0;
+  function renderList(){
+    const list=$("#noteList");list.innerHTML="";
+    notesData.forEach((n,i)=>{
+      const d=document.createElement("div");d.className="noteItem"+(i===selected?" active":"");
+      d.innerHTML="<strong>"+escapeHtml(n.title||"untitled")+"</strong><small>"+escapeHtml(n.date||"")+"</small>";
+      d.onclick=()=>{selected=i;loadNote();renderList()};
+      list.appendChild(d);
+    });
+  }
+  function loadNote(){const n=notesData[selected];$("#noteTitle").value=n.title;$("#noteText").value=n.text}
+  function saveNotes(){localStorage.setItem("smolOS_notes",JSON.stringify(notesData))}
+  function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+  $("#saveNote").onclick=()=>{notesData[selected].title=$("#noteTitle").value||"untitled";notesData[selected].text=$("#noteText").value;notesData[selected].date=new Date().toLocaleDateString();saveNotes();renderList()};
+  $("#addNote").onclick=()=>{notesData.push({title:"new note",text:"",date:new Date().toLocaleDateString()});selected=notesData.length-1;saveNotes();renderList();loadNote()};
+  renderList();loadNote();
+
+  // CLOCK APP
+  const clockIcon=$("#clockIcon"),clockApp=$("#clockApp");
+  drag(clockApp,$("#clockHeader"));
+  clockIcon.onclick=()=>open(clockApp,clockIcon);
+  $("#clockClose").onclick=()=>close(clockApp,clockIcon);
+
+  function updateBigClock(){
+    const now=new Date();
+    $("#bigClock").textContent=now.toLocaleTimeString([], {hour:"numeric",minute:"2-digit",second:"2-digit",hour12:true});
+    $("#bigDate").textContent=now.toLocaleDateString(undefined,{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+  }
+  updateBigClock();
+  setInterval(updateBigClock,1000);
+
+  
+  const calculatorIcon=$("#calculatorIcon"),calculatorApp=$("#calculatorApp");
+  drag(calculatorApp,$("#calculatorHeader"));
+  calculatorIcon.onclick=()=>open(calculatorApp,calculatorIcon);
+  $("#calculatorClose").onclick=()=>close(calculatorApp,calculatorIcon);
+
+  const calcDisplay=$("#calcDisplay"),calcKeys=$("#calcKeys");
+  let calcValue="",calcStored=null,calcOp=null,calcFresh=true;
+  const keys=[
+    ["C","clear"],["⌫","back"],["÷","op"],["×","op"],
+    ["7","num"],["8","num"],["9","num"],["−","op"],
+    ["4","num"],["5","num"],["6","num"],["+","op"],
+    ["1","num"],["2","num"],["3","num"],["=","equals"],
+    ["0","num wide"],[".","num"]
+  ];
+  function calcRender(){calcDisplay.value=calcValue||"0"}
+  function calculate(a,b,op){
+    if(op==="+")return a+b;
+    if(op==="−")return a-b;
+    if(op==="×")return a*b;
+    if(op==="÷")return b===0?NaN:a/b;
+    return b;
+  }
+  function calcPress(value,type){
+    if(type==="clear"){calcValue="";calcStored=null;calcOp=null;calcFresh=true;calcRender();return}
+    if(type==="back"){calcValue=calcValue.slice(0,-1);calcRender();return}
+    if(type==="num"){
+      if(calcFresh){calcValue="";calcFresh=false}
+      if(value==="."&&calcValue.includes("."))return;
+      calcValue+=value;calcRender();return
+    }
+    if(type==="op"){
+      const n=Number(calcValue||0);
+      if(calcStored!==null&&calcOp!==null&&!calcFresh){
+        calcStored=calculate(calcStored,n,calcOp);
+        calcValue=String(calcStored);
+      }else calcStored=n;
+      calcOp=value;calcFresh=true;calcRender();return
+    }
+    if(type==="equals"&&calcOp){
+      const result=calculate(calcStored,Number(calcValue||0),calcOp);
+      calcValue=Number.isFinite(result)?String(+result.toFixed(10)):"Error";
+      calcStored=null;calcOp=null;calcFresh=true;calcRender();
+    }
+  }
+  keys.forEach(([label,type,extra])=>{
+    const b=document.createElement("button");
+    b.textContent=label;
+    if(type==="op"||type==="equals")b.className="calc-op";
+    if(extra==="wide")b.style.gridColumn="span 2";
+    b.onclick=()=>calcPress(label,type);
+    calcKeys.appendChild(b);
+  });
+
+})();
+</script>
+</body>
+</html>
