@@ -8,5 +8,10 @@ A web-OS created by taking inspiration from the design of Smol YSWS (smol.hackcl
 - contains a calculator,clock and notes
 * inspired by the smol YSWS (check it out at smol.hackclub.com)
 + this is a fun webOS me approved
++ made using html,css,js all in a single .html file
+  #### to run this locally
+  + clone this repo
+  + click the index.html file in the directory
+  + run it locally in the browser of your choice after opening the .html fole
  ### credits: all credits to the Smol YSWS (they inspired the design for this web os)
 
