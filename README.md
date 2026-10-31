@@ -12,6 +12,6 @@ A web-OS created by taking inspiration from the design of Smol YSWS (smol.hackcl
   #### to run this locally
   + clone this repo
   + click the index.html file in the directory
-  + run it locally in the browser of your choice after opening the .html fole
+  + run it locally in the browser of your choice 
  ### credits: all credits to the Smol YSWS (they inspired the design for this web os)
 
